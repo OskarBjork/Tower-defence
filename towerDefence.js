@@ -1,7 +1,9 @@
-class Entity {
+class Entity extends ex.Actor {
   constructor(hp, damage, speed, attackSpeed, x, y) {
-    this.x = x;
-    this.y = y;
+    super({
+      x: x,
+      y: y,
+    });
     this.hp = hp;
     this.damage = damage;
     this.speed = speed;
@@ -58,10 +60,10 @@ function main() {
   const enemy = new Enemy(100, 10, 1, 1, 8, 4);
   console.log("hello world");
   var running = true;
-  const canvas1 = document.getElementById("player1Canvas");
-  const ctx1 = canvas1.getContext("2d");
+  // const canvas1 = document.getElementById("player1Canvas");
+  // const ctx1 = canvas1.getContext("2d");
 
-  ctx1.fillRect(0, 0, 100, 100);
+  // ctx1.fillRect(0, 0, 100, 100);
 }
 
 main();
