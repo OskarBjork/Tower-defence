@@ -1,8 +1,37 @@
 const vec = ex.vec;
 
+const ANCHOR_CENTER = ex.vec(0.5, 0.5);
+const SCALE_2X = ex.vec(2, 2);
+
 const Engine = ex.Engine;
 const Actor = ex.Actor;
 const Color = ex.Color;
+
+const Images = {
+  stuvis: new ex.ImageSource("stuvis.jpg"),
+};
+
+const loader = new ex.Loader();
+loader.suppressPlayButton = true;
+const allResources = Object.values(Images);
+for (const resource of allResources) {
+  loader.addResource(resource);
+}
+
+class Player extends Actor {
+  constructor(x, y) {
+    super({
+      x: x,
+      y: y,
+      width: 48,
+      height: 48,
+      collider: ex.Shape.Box(11, 22, ANCHOR_CENTER, vec(0, -3)),
+      scale: SCALE_2X,
+      collisionType: ex.CollisionType.Active,
+      color: ex.Color.Green,
+    });
+  }
+}
 
 const padding = 20;
 const xoffset = 65;
@@ -111,4 +140,20 @@ bricks.forEach((brick) => {
   brick.body.collisionType = ex.CollisionType.Active;
   game.add(brick);
 });
-game.start();
+
+const stuvisTexture = new ex.ImageSource("stuvis.jpg");
+
+loader.addResource(stuvisTexture);
+
+const player = new Player(100, 100);
+game.add(player);
+
+await game.start(loader);
+
+const stuvisSprite = new ex.Sprite({
+  image: await stuvisTexture.load(),
+  width: 48,
+  height: 48,
+});
+
+player.addDrawing(stuvisSprite);
