@@ -18,6 +18,19 @@ class Entity extends Actor {
   }
 }
 
+class Bullet extends Actor {
+  constructor(config) {
+    super({
+      x: config.x,
+      y: config.y,
+      width: 10,
+      height: 10,
+      color: config.color,
+      vel: new vec(200, 0),
+    });
+  }
+}
+
 const grid = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -41,6 +54,15 @@ async function main() {
     x: 1,
     y: 2,
     color: ex.Color.Red,
+  });
+
+  myEntity.on("pointerdown", (e) => {
+    const bullet = new Bullet({
+      x: myEntity.center._x + myEntity.width / 2,
+      y: myEntity.center._y,
+      color: ex.Color.Blue,
+    });
+    game.add(bullet);
   });
   game.add(myEntity);
   const loader = new ex.Loader();
