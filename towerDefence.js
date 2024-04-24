@@ -14,6 +14,7 @@ class Entity extends Actor {
       width: tileSize,
       height: tileSize,
       color: config.color,
+      vel:config.vel
     });
     this.hp = config.hp
   }
@@ -36,6 +37,14 @@ class Defender extends Entity {
   constructor(config){
     super(config)
     this.attackSpeed = 10
+  }
+  shoot(game) {
+    const bullet = new Bullet({
+      x: this.pos.x + this.width / 2,
+      y: this.pos.y,
+      color: ex.Color.Blue,
+    });
+    game.add(bullet);
   }
 }
 
@@ -80,17 +89,14 @@ async function main() {
     x: 5,
     y: 2,
     color: ex.Color.Green,
-    hp: 5
+    hp: 5,
+    vel:vec(-100,0)
   });
 
-  myDefender.on("pointerdown", (e) => {
-    const bullet = new Bullet({
-      x: myDefender.center._x + myDefender.width / 2,
-      y: myDefender.center._y,
-      color: ex.Color.Blue,
-    });
-    game.add(bullet);
+  myDefender.on("pointerdown", function() {
+    myDefender.shoot(game)
   });
+  console.log(myDefender)
   myEnemy.on("collisionstart", (e) => {
     e.other.kill();
     e.target.hp --     
