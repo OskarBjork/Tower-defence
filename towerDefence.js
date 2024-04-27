@@ -14,9 +14,9 @@ class Entity extends Actor {
       width: tileSize,
       height: tileSize,
       color: config.color,
-      vel:config.vel
+      vel: config.vel,
     });
-    this.hp = config.hp
+    this.hp = config.hp;
   }
 }
 
@@ -34,9 +34,9 @@ class Bullet extends Actor {
 }
 
 class Defender extends Entity {
-  constructor(config){
-    super(config)
-    this.attackSpeed = 10
+  constructor(config) {
+    super(config);
+    this.attackSpeed = 10;
   }
   shoot(game) {
     const bullet = new Bullet({
@@ -49,15 +49,13 @@ class Defender extends Entity {
 }
 
 class BasicDefender extends Defender {
-  constructor(config){
-
-  }
+  constructor(config) {}
 }
 
 class Attacker extends Entity {
-  constructor(config){
-    super(config)
-    this.speed = 10
+  constructor(config) {
+    super(config);
+    this.speed = 10;
   }
 }
 
@@ -74,6 +72,38 @@ function placeEntities(entities) {
     grid[entity.x][entity.y] = entity;
   });
 }
+function random(array) {
+  const index = Math.floor(Math.random() * array.length);
+  return array[index];
+}
+
+function spawnEnemy() {
+  const colors = [ex.Color.Red, ex.Color.Blue, ex.Color.Green];
+  return new Attacker({
+    x: 7,
+    y: random([1, 2, 3, 4, 5]),
+    color: random(colors),
+    hp: 5,
+    vel: vec(-100, 0),
+  });
+}
+
+function spawnEnemies() {
+  const enemies = [];
+  const colors = [ex.Color.Red, ex.Color.Blue, ex.Color.Green];
+  for (let i = 1; i <= 5; i++) {
+    enemies.push(
+      new Attacker({
+        x: 6,
+        y: i,
+        color: random(colors),
+        hp: 5,
+        vel: vec(-50, 0),
+      })
+    );
+  }
+  return enemies;
+}
 
 async function main() {
   const game = new ex.Engine({
@@ -85,27 +115,25 @@ async function main() {
     y: 2,
     color: ex.Color.Red,
   });
-  const myEnemy = new Attacker({
-    x: 5,
-    y: 2,
-    color: ex.Color.Green,
-    hp: 5,
-    vel:vec(-100,0)
-  });
 
-  myDefender.on("pointerdown", function() {
-    myDefender.shoot(game)
+  setInterval(() => {
+    const newEnemy = spawnEnemy();
+    game.add(newEnemy);
+  }, 3000);
+
+  myDefender.on("pointerdown", function () {
+    myDefender.shoot(game);
   });
-  console.log(myDefender)
-  myEnemy.on("collisionstart", (e) => {
-    e.other.kill();
-    e.target.hp --     
-    if(e.target.hp < 1){
-      e.target.kill();
-    }
-  });
+  console.log(myDefender);
+  // myEnemy.on("collisionstart", (e) => {
+  //   e.other.kill();
+  //   e.target.hp--;
+  //   if (e.target.hp < 1) {
+  //     e.target.kill();
+  //   }
+  // });
   game.add(myDefender);
-  game.add(myEnemy);
+  // game.add(myEnemy);
   const loader = new ex.Loader();
   loader.suppressPlayButton = true;
   await game.start(loader);
