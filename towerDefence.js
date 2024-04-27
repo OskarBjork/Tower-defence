@@ -1,3 +1,5 @@
+// TODO: Fix bug where dead shooters still try to shoot
+
 const vec = ex.vec;
 const SCALE_2X = vec(2, 2);
 
@@ -69,6 +71,7 @@ class Defender extends Entity {
       this.defenderType === "shooter" ? shooterPrice : collectorPrice;
     if (this.defenderType === "shooter") {
       setInterval(() => {
+        if (this.isKilled()) return;
         this.shoot();
       }, this.attackSpeed);
     }
@@ -208,6 +211,18 @@ async function main() {
     const newEnemy = spawnEnemy();
     game.add(newEnemy);
   }, 3000);
+
+  setInterval(() => {
+    const actors = game.currentScene.actors;
+    const collectors = actors.filter(
+      (actor) => actor instanceof Defender && actor.defenderType === "collector"
+    );
+    console.log(collectors);
+    collectors.forEach((collector) => {
+      playerCredits += 10;
+      creditsDisplay.textContent = `Credits: ${playerCredits}`;
+    });
+  }, 1000);
 
   myDefender.on("pointerdown", function () {
     myDefender.shoot(game);
