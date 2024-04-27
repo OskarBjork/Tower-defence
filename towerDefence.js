@@ -45,11 +45,15 @@ class Bullet extends Actor {
 class Defender extends Entity {
   constructor(config) {
     super(config);
-    this.attackSpeed = 1000;
+    console.log(config.defenderType);
+    this.defenderType = config.defenderType ?? "shooter";
+    this.attackSpeed = this.defenderType === "shooter" ? 1000 : null;
     this.game = config.game;
-    setInterval(() => {
-      this.shoot();
-    }, this.attackSpeed);
+    if (this.defenderType === "shooter") {
+      setInterval(() => {
+        this.shoot();
+      }, this.attackSpeed);
+    }
   }
   shoot() {
     const bullet = new Bullet({
