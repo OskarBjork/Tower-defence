@@ -6,7 +6,14 @@ const Actor = ex.Actor;
 const ANCHOR_CENTER = vec(0.5, 0.5);
 const tileSize = 120;
 
+const canvas1 = document.querySelector("#canvas1");
+
+const shooterBtn = document.querySelector("#shooterBtn");
+const collectorBtn = document.querySelector("#collectorBtn");
+
 const defenderTypes = ["shooter", "collector"];
+
+let currentDefenderType = "shooter";
 
 class Entity extends Actor {
   constructor(config) {
@@ -138,7 +145,22 @@ async function main() {
   const game = new ex.Engine({
     width: 800,
     height: 600,
+    canvasElementId: "canvas1",
   });
+
+  game.input.pointers.primary.on("down", (evt) => {
+    console.log(`Mouse clicked at ${evt.worldPos.x}, ${evt.worldPos.y}`);
+    const row = Math.floor(evt.worldPos.y / tileSize) + 1;
+    const column = Math.floor(evt.worldPos.x / tileSize) + 1;
+    const newDefender = new Defender({
+      x: column,
+      y: row,
+      color: ex.Color.Red,
+      game: game,
+    });
+    game.add(newDefender);
+  });
+
   const myDefender = new Defender({
     x: 1,
     y: 2,
