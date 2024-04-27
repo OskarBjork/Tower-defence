@@ -10,10 +10,17 @@ const canvas1 = document.querySelector("#canvas1");
 
 const shooterBtn = document.querySelector("#shooterBtn");
 const collectorBtn = document.querySelector("#collectorBtn");
+const creditsDisplay = document.querySelector("#creditsDisplay");
 
 const defenderTypes = ["shooter", "collector"];
 
 let currentDefenderType = "shooter";
+
+let playerCredits = 100;
+const shooterPrice = 30;
+const collectorPrice = 20;
+
+creditsDisplay.textContent = `Credits: ${playerCredits}`;
 
 shooterBtn.addEventListener("click", () => {
   currentDefenderType = "shooter";
@@ -58,6 +65,8 @@ class Defender extends Entity {
     this.attackSpeed = this.defenderType === "shooter" ? 1000 : null;
     this.game = config.game;
     this.color = this.defenderType === "shooter" ? ex.Color.Red : ex.Color.Blue;
+    this.creditCost =
+      this.defenderType === "shooter" ? shooterPrice : collectorPrice;
     if (this.defenderType === "shooter") {
       setInterval(() => {
         this.shoot();
@@ -162,7 +171,6 @@ async function main() {
   });
 
   game.input.pointers.primary.on("down", (evt) => {
-    console.log(`Mouse clicked at ${evt.worldPos.x}, ${evt.worldPos.y}`);
     const row = Math.floor(evt.worldPos.y / tileSize) + 1;
     const column = Math.floor(evt.worldPos.x / tileSize) + 1;
     const newDefender = new Defender({
@@ -172,7 +180,12 @@ async function main() {
       game: game,
       defenderType: currentDefenderType,
     });
+    if (playerCredits < newDefender.creditCost) {
+      return;
+    }
     game.add(newDefender);
+    playerCredits -= newDefender.creditCost;
+    creditsDisplay.textContent = `Credits: ${playerCredits}`;
   });
 
   const myDefender = new Defender({
