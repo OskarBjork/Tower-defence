@@ -56,6 +56,29 @@ class Attacker extends Entity {
   constructor(config) {
     super(config);
     this.speed = 10;
+    this.on("collisionstart", (e) => {
+      if (e.other instanceof Bullet) {
+        e.other.kill();
+        this.hp--;
+        if (this.hp < 1) {
+          this.kill();
+        }
+        return;
+      }
+      if (e.other instanceof Defender) {
+        this.kill();
+        e.other.kill();
+      }
+    });
+  }
+
+  update(engine, delta) {
+    super.update(engine, delta);
+    const worldBounds = engine.getWorldBounds();
+    if (this.pos.x < worldBounds.left || this.pos.x > worldBounds.right) {
+      console.log("out of bounds");
+      this.kill();
+    }
   }
 }
 
@@ -116,6 +139,15 @@ async function main() {
     color: ex.Color.Red,
   });
 
+  const firstEnemy = new Attacker({
+    x: 7,
+    y: 2,
+    color: ex.Color.Green,
+    hp: 5,
+    vel: vec(-100, 0),
+  });
+  game.add(firstEnemy);
+
   setInterval(() => {
     const newEnemy = spawnEnemy();
     game.add(newEnemy);
@@ -125,13 +157,6 @@ async function main() {
     myDefender.shoot(game);
   });
   console.log(myDefender);
-  // myEnemy.on("collisionstart", (e) => {
-  //   e.other.kill();
-  //   e.target.hp--;
-  //   if (e.target.hp < 1) {
-  //     e.target.kill();
-  //   }
-  // });
   game.add(myDefender);
   // game.add(myEnemy);
   const loader = new ex.Loader();
