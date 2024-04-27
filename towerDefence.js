@@ -32,6 +32,8 @@ collectorBtn.addEventListener("click", () => {
   currentDefenderType = "collector";
 });
 
+const intervals = [];
+
 class Entity extends Actor {
   constructor(config) {
     super({
@@ -62,7 +64,6 @@ class Bullet extends Actor {
 class Defender extends Entity {
   constructor(config) {
     super(config);
-    console.log(config.defenderType);
     this.defenderType = config.defenderType ?? "shooter";
     this.attackSpeed = this.defenderType === "shooter" ? 1000 : null;
     this.game = config.game;
@@ -70,9 +71,9 @@ class Defender extends Entity {
     this.creditCost =
       this.defenderType === "shooter" ? shooterPrice : collectorPrice;
     if (this.defenderType === "shooter") {
-      setInterval(() => {
-        if (this.isKilled()) return;
-        this.shoot();
+      this.intervalId = setInterval(() => {
+        if (this.isKilled()) clearInterval(this.intervalId);
+        else this.shoot();
       }, this.attackSpeed);
     }
   }
@@ -114,8 +115,18 @@ class Attacker extends Entity {
     super.update(engine, delta);
     const worldBounds = engine.getWorldBounds();
     if (this.pos.x < worldBounds.left || this.pos.x > worldBounds.right) {
-      console.log("out of bounds");
-      this.kill();
+      engine.currentScene.actors.forEach((actor) => {
+        actor.kill();
+        intervals.forEach((interval) => clearInterval(interval));
+      });
+      const gameOver = new ex.Label({
+        x: 400,
+        y: 300,
+        text: "Game Over",
+        fontSize: 100,
+        color: ex.Color.White,
+      });
+      engine.add(gameOver);
     }
   }
 }
@@ -191,44 +202,35 @@ async function main() {
     creditsDisplay.textContent = `Credits: ${playerCredits}`;
   });
 
-  const myDefender = new Defender({
-    x: 1,
-    y: 2,
-    color: ex.Color.Red,
-    game: game,
-  });
+  // const myDefender = new Defender({
+  //   x: 1,
+  //   y: 2,
+  //   color: ex.Color.Red,
+  //   game: game,
+  // });
 
-  const firstEnemy = new Attacker({
-    x: 7,
-    y: 2,
-    color: ex.Color.Green,
-    hp: 5,
-    vel: vec(-100, 0),
-  });
+  const firstEnemy = spawnEnemy();
   game.add(firstEnemy);
 
-  setInterval(() => {
+  let spawnEnemyIntervalId = setInterval(() => {
     const newEnemy = spawnEnemy();
     game.add(newEnemy);
   }, 3000);
+  intervals.push(spawnEnemyIntervalId);
 
-  setInterval(() => {
+  let collectorIntervalId = setInterval(() => {
     const actors = game.currentScene.actors;
     const collectors = actors.filter(
       (actor) => actor instanceof Defender && actor.defenderType === "collector"
     );
-    console.log(collectors);
     collectors.forEach((collector) => {
       playerCredits += 10;
       creditsDisplay.textContent = `Credits: ${playerCredits}`;
     });
   }, 1000);
+  intervals.push(collectorIntervalId);
 
-  myDefender.on("pointerdown", function () {
-    myDefender.shoot(game);
-  });
-  console.log(myDefender);
-  game.add(myDefender);
+  // game.add(myDefender);
   // game.add(myEnemy);
   const loader = new ex.Loader();
   loader.suppressPlayButton = true;
