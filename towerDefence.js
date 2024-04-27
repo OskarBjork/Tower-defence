@@ -15,6 +15,14 @@ const defenderTypes = ["shooter", "collector"];
 
 let currentDefenderType = "shooter";
 
+shooterBtn.addEventListener("click", () => {
+  currentDefenderType = "shooter";
+});
+
+collectorBtn.addEventListener("click", () => {
+  currentDefenderType = "collector";
+});
+
 class Entity extends Actor {
   constructor(config) {
     super({
@@ -49,6 +57,7 @@ class Defender extends Entity {
     this.defenderType = config.defenderType ?? "shooter";
     this.attackSpeed = this.defenderType === "shooter" ? 1000 : null;
     this.game = config.game;
+    this.color = this.defenderType === "shooter" ? ex.Color.Red : ex.Color.Blue;
     if (this.defenderType === "shooter") {
       setInterval(() => {
         this.shoot();
@@ -161,6 +170,7 @@ async function main() {
       y: row,
       color: ex.Color.Red,
       game: game,
+      defenderType: currentDefenderType,
     });
     game.add(newDefender);
   });
