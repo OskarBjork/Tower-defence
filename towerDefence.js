@@ -6,6 +6,8 @@ const Actor = ex.Actor;
 const ANCHOR_CENTER = vec(0.5, 0.5);
 const tileSize = 120;
 
+const defenderTypes = ["shooter", "collector"];
+
 class Entity extends Actor {
   constructor(config) {
     super({
@@ -36,15 +38,19 @@ class Bullet extends Actor {
 class Defender extends Entity {
   constructor(config) {
     super(config);
-    this.attackSpeed = 10;
+    this.attackSpeed = 1000;
+    this.game = config.game;
+    setInterval(() => {
+      this.shoot();
+    }, this.attackSpeed);
   }
-  shoot(game) {
+  shoot() {
     const bullet = new Bullet({
       x: this.pos.x + this.width / 2,
       y: this.pos.y,
       color: ex.Color.Blue,
     });
-    game.add(bullet);
+    this.game.add(bullet);
   }
 }
 
@@ -137,6 +143,7 @@ async function main() {
     x: 1,
     y: 2,
     color: ex.Color.Red,
+    game: game,
   });
 
   const firstEnemy = new Attacker({
