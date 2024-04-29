@@ -10,7 +10,13 @@ const Actor = ex.Actor;
 const ANCHOR_CENTER = vec(0.5, 0.5);
 const tileSize = 120;
 
+const gameDiv = document.querySelector("#gameDiv");
+
 const canvas1 = document.querySelector("#canvas1");
+const canvas2 = document.querySelector("#canvas2");
+
+const loginDiv = document.querySelector("#loginDiv");
+const loginBtn = document.querySelector("#loginBtn");
 
 const shooterBtn = document.querySelector("#shooterBtn");
 const collectorBtn = document.querySelector("#collectorBtn");
@@ -32,6 +38,11 @@ shooterBtn.addEventListener("click", () => {
 
 collectorBtn.addEventListener("click", () => {
   currentDefenderType = "collector";
+});
+
+loginBtn.addEventListener("click", () => {
+  loginDiv.style.display = "none";
+  socket.emit("gameStart");
 });
 
 const intervals = [];
@@ -242,6 +253,7 @@ function createIntervals(game) {
 }
 
 async function main() {
+  gameDiv.style.display = "flex";
   const game1 = new ex.Engine({
     width: 800,
     height: 600,
@@ -274,4 +286,6 @@ async function main() {
   await game2.start(loader);
 }
 
-main();
+socket.on("gameStart", () => {
+  main();
+});

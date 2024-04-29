@@ -9,7 +9,11 @@
     <script src="towerDefence.js" type="module"></script>
   </head>
   <body>
-    <div style="display: flex; flex-direction: row">
+    <div id="loginDiv">
+      <input type="text" id="username" placeholder="username" />
+      <button id="loginBtn">Login</button>
+    </div>
+    <div style="display: none; flex-direction: row" id="gameDiv">
       <div style="margin-right: 1rem">
         <canvas width="600" height="800" id="canvas1"></canvas>
         <div id="defenderSelector">
