@@ -189,6 +189,56 @@ function checkIfDefenderExists(x, y) {
   return grid[x][y] instanceof Defender;
 }
 
+function addMouseClickEvent(game) {
+  game.input.pointers.primary.on("down", (evt) => {
+    const row = Math.floor(evt.worldPos.y / tileSize) + 1;
+    const column = Math.floor(evt.worldPos.x / tileSize) + 1;
+    let price = 10;
+    if (currentDefenderType === "shooter") {
+      price = shooterPrice;
+    }
+    if (currentDefenderType === "collector") {
+      price = collectorPrice;
+    }
+    if (playerCredits < price) {
+      return;
+    }
+    if (checkIfDefenderExists(column, row)) {
+      return;
+    }
+    const newDefender = new Defender({
+      x: column,
+      y: row,
+      color: ex.Color.Red,
+      game: game,
+      defenderType: currentDefenderType,
+    });
+    game.add(newDefender);
+    playerCredits -= newDefender.creditCost;
+    creditsDisplay.textContent = `Credits: ${playerCredits}`;
+  });
+}
+
+function createIntervals(game) {
+  let spawnEnemyIntervalId = setInterval(() => {
+    const newEnemy = spawnEnemy();
+    game.add(newEnemy);
+  }, 3000);
+  intervals.push(spawnEnemyIntervalId);
+
+  let collectorIntervalId = setInterval(() => {
+    const actors = game.currentScene.actors;
+    const collectors = actors.filter(
+      (actor) => actor instanceof Defender && actor.defenderType === "collector"
+    );
+    collectors.forEach((collector) => {
+      playerCredits += 10;
+      creditsDisplay.textContent = `Credits: ${playerCredits}`;
+    });
+  }, 1000);
+  intervals.push(collectorIntervalId);
+}
+
 async function main() {
   const game1 = new ex.Engine({
     width: 800,
@@ -202,62 +252,7 @@ async function main() {
     canvasElementId: "canvas2",
   });
 
-  game1.input.pointers.primary.on("down", (evt) => {
-    const row = Math.floor(evt.worldPos.y / tileSize) + 1;
-    const column = Math.floor(evt.worldPos.x / tileSize) + 1;
-    let price = 10;
-    if (currentDefenderType === "shooter") {
-      price = shooterPrice;
-    }
-    if (currentDefenderType === "collector") {
-      price = collectorPrice;
-    }
-    if (playerCredits < price) {
-      return;
-    }
-    if (checkIfDefenderExists(column, row)) {
-      return;
-    }
-    const newDefender = new Defender({
-      x: column,
-      y: row,
-      color: ex.Color.Red,
-      game: game1,
-      defenderType: currentDefenderType,
-    });
-    game1.add(newDefender);
-    playerCredits -= newDefender.creditCost;
-    creditsDisplay.textContent = `Credits: ${playerCredits}`;
-  });
-
-  game2.input.pointers.primary.on("down", (evt) => {
-    const row = Math.floor(evt.worldPos.y / tileSize) + 1;
-    const column = Math.floor(evt.worldPos.x / tileSize) + 1;
-    let price = 10;
-    if (currentDefenderType === "shooter") {
-      price = shooterPrice;
-    }
-    if (currentDefenderType === "collector") {
-      price = collectorPrice;
-    }
-    if (playerCredits < price) {
-      return;
-    }
-    if (checkIfDefenderExists(column, row)) {
-      return;
-    }
-    const newDefender = new Defender({
-      x: column,
-      y: row,
-      color: ex.Color.Red,
-      game: game1,
-      defenderType: currentDefenderType,
-    });
-    game2.add(newDefender);
-    playerCredits -= newDefender.creditCost;
-    creditsDisplay.textContent = `Credits: ${playerCredits}`;
-  });
-
+  addMouseClickEvent(game1);
   // const myDefender = new Defender({
   //   x: 1,
   //   y: 2,
@@ -266,28 +261,9 @@ async function main() {
   // });
 
   const firstEnemy = spawnEnemy();
-  game1.add(firstEnemy);
-  game2.add(firstEnemy);
 
-  let spawnEnemyIntervalId = setInterval(() => {
-    const newEnemy = spawnEnemy();
-    game1.add(newEnemy);
-    game2.add(newEnemy);
-  }, 3000);
-  intervals.push(spawnEnemyIntervalId);
-
-  let collectorIntervalId = setInterval(() => {
-    const actors = game1.currentScene.actors;
-    const collectors = actors.filter(
-      (actor) => actor instanceof Defender && actor.defenderType === "collector"
-    );
-    collectors.forEach((collector) => {
-      playerCredits += 10;
-      creditsDisplay.textContent = `Credits: ${playerCredits}`;
-    });
-  }, 1000);
-  intervals.push(collectorIntervalId);
-
+  createIntervals(game1);
+  createIntervals(game2);
   // game.add(myDefender);
   // game.add(myEnemy);
   const loader = new ex.Loader();
