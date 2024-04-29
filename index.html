@@ -8,11 +8,18 @@
     <script src="towerDefence.js" type="module"></script>
   </head>
   <body>
-    <canvas width="600" height="800" id="canvas1"></canvas>
-    <div id="defenderSelector">
-      <button id="shooterBtn">shooter</button>
-      <button id="collectorBtn">collector</button>
-      <p id="creditsDisplay">Credits:</p>
+    <div style="display: flex; flex-direction: row">
+      <div style="margin-right: 1rem">
+        <canvas width="600" height="800" id="canvas1"></canvas>
+        <div id="defenderSelector">
+          <button id="shooterBtn">shooter</button>
+          <button id="collectorBtn">collector</button>
+          <p id="creditsDisplay">Credits:</p>
+        </div>
+      </div>
+      <div>
+        <canvas width="600" height="800" id="canvas2"></canvas>
+      </div>
     </div>
   </body>
 </html>
