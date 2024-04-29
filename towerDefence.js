@@ -34,6 +34,14 @@ collectorBtn.addEventListener("click", () => {
 
 const intervals = [];
 
+const grid = [
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+];
+
 class Entity extends Actor {
   constructor(config) {
     super({
@@ -70,12 +78,20 @@ class Defender extends Entity {
     this.color = this.defenderType === "shooter" ? ex.Color.Red : ex.Color.Blue;
     this.creditCost =
       this.defenderType === "shooter" ? shooterPrice : collectorPrice;
+    grid[config.x][config.y] = this;
+    this.row = config.y;
+    this.column = config.x;
     if (this.defenderType === "shooter") {
       this.intervalId = setInterval(() => {
         if (this.isKilled()) clearInterval(this.intervalId);
         else this.shoot();
       }, this.attackSpeed);
     }
+  }
+  kill() {
+    super.kill();
+    grid[this.column][this.row] = 0;
+    clearInterval(this.intervalId);
   }
   shoot() {
     const bullet = new Bullet({
@@ -131,14 +147,6 @@ class Attacker extends Entity {
   }
 }
 
-const grid = [
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-];
-
 function placeEntities(entities) {
   entities.forEach((entity) => {
     grid[entity.x][entity.y] = entity;
@@ -177,6 +185,10 @@ function spawnEnemies() {
   return enemies;
 }
 
+function checkIfDefenderExists(x, y) {
+  return grid[x][y] instanceof Defender;
+}
+
 async function main() {
   const game = new ex.Engine({
     width: 800,
@@ -195,6 +207,9 @@ async function main() {
       price = collectorPrice;
     }
     if (playerCredits < price) {
+      return;
+    }
+    if (checkIfDefenderExists(column, row)) {
       return;
     }
     const newDefender = new Defender({
