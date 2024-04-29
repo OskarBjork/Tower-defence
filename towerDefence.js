@@ -187,6 +187,16 @@ async function main() {
   game.input.pointers.primary.on("down", (evt) => {
     const row = Math.floor(evt.worldPos.y / tileSize) + 1;
     const column = Math.floor(evt.worldPos.x / tileSize) + 1;
+    let price = 10;
+    if (currentDefenderType === "shooter") {
+      price = shooterPrice;
+    }
+    if (currentDefenderType === "collector") {
+      price = collectorPrice;
+    }
+    if (playerCredits < price) {
+      return;
+    }
     const newDefender = new Defender({
       x: column,
       y: row,
@@ -194,9 +204,6 @@ async function main() {
       game: game,
       defenderType: currentDefenderType,
     });
-    if (playerCredits < newDefender.creditCost) {
-      return;
-    }
     game.add(newDefender);
     playerCredits -= newDefender.creditCost;
     creditsDisplay.textContent = `Credits: ${playerCredits}`;
