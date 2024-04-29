@@ -3,6 +3,8 @@
 const vec = ex.vec;
 const SCALE_2X = vec(2, 2);
 
+const socket = io();
+
 const Actor = ex.Actor;
 
 const ANCHOR_CENTER = vec(0.5, 0.5);
