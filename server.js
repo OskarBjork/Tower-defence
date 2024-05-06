@@ -18,6 +18,9 @@ app.get("/", (req, res) => {
 
 io.on("connection", (socket) => {
   console.log("a user connected");
+  socket.on("login", (data) => {
+    console.log("login", data);
+  });
 });
 
 server.listen(3000, () => {

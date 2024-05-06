@@ -16,6 +16,7 @@ const canvas1 = document.querySelector("#canvas1");
 const canvas2 = document.querySelector("#canvas2");
 
 const loginDiv = document.querySelector("#loginDiv");
+const loginInput = document.querySelector("#usernameInput");
 const loginBtn = document.querySelector("#loginBtn");
 
 const shooterBtn = document.querySelector("#shooterBtn");
@@ -42,7 +43,9 @@ collectorBtn.addEventListener("click", () => {
 
 loginBtn.addEventListener("click", () => {
   loginDiv.style.display = "none";
-  socket.emit("gameStart");
+  console.log("lol");
+  console.log(loginInput.value);
+  socket.emit("login", { username: loginInput.value });
 });
 
 const intervals = [];
