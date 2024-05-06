@@ -23,11 +23,17 @@ io.on("connection", (socket) => {
   socket.on("login", (data) => {
     console.log("login", data);
     let newUser = { ...data, id: socket.id };
+    if (users.length === 0) {
+      newUser.canvas = "canvas1";
+    }
+    if (users.length === 1) {
+      newUser.canvas = "canvas2";
+    }
     if (users.length < 2) {
       users.push(newUser);
     }
     console.log(users);
-    if (users.length == 2) {
+    if (users.length >= 2) {
       console.log("two users connected");
       io.emit("start", users);
     }
@@ -39,6 +45,11 @@ io.on("connection", (socket) => {
       console.log("too few users left");
     }
     console.log(users);
+  });
+  socket.on("click", (data) => {
+    console.log("click", data);
+    const user = users.find((user) => user.id === socket.id);
+    io.emit("click", { ...data, user });
   });
 });
 

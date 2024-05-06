@@ -27,6 +27,7 @@ const defenderTypes = ["shooter", "collector"];
 
 let currentDefenderType = "shooter";
 
+let clientUsername = "not set yet";
 let playerCredits = 100;
 const shooterPrice = 30;
 const collectorPrice = 20;
@@ -46,6 +47,7 @@ loginBtn.addEventListener("click", () => {
   console.log("lol");
   console.log(loginInput.value);
   socket.emit("login", { username: loginInput.value });
+  clientUsername = loginInput.value;
 });
 
 // IO events
@@ -53,6 +55,10 @@ loginBtn.addEventListener("click", () => {
 socket.on("start", (users) => {
   gameDiv.style.display = "flex";
   main();
+});
+
+socket.on("click", (data) => {
+  console.log(data);
 });
 
 const intervals = [];
@@ -214,32 +220,38 @@ function checkIfDefenderExists(x, y) {
 
 function addMouseClickEvent(game) {
   game.input.pointers.primary.on("down", (evt) => {
-    const row = Math.floor(evt.worldPos.y / tileSize) + 1;
-    const column = Math.floor(evt.worldPos.x / tileSize) + 1;
-    let price = 10;
-    if (currentDefenderType === "shooter") {
-      price = shooterPrice;
-    }
-    if (currentDefenderType === "collector") {
-      price = collectorPrice;
-    }
-    if (playerCredits < price) {
-      return;
-    }
-    if (checkIfDefenderExists(column, row)) {
-      return;
-    }
-    const newDefender = new Defender({
-      x: column,
-      y: row,
-      color: ex.Color.Red,
-      game: game,
-      defenderType: currentDefenderType,
+    socket.emit("click", {
+      x: evt.worldPos.x,
+      y: evt.worldPos.y,
+      currentDefenderType: currentDefenderType,
     });
-    game.add(newDefender);
-    playerCredits -= newDefender.creditCost;
-    creditsDisplay.textContent = `Credits: ${playerCredits}`;
   });
+  //   const row = Math.floor(evt.worldPos.y / tileSize) + 1;
+  //   const column = Math.floor(evt.worldPos.x / tileSize) + 1;
+  //   let price = 10;
+  //   if (currentDefenderType === "shooter") {
+  //     price = shooterPrice;
+  //   }
+  //   if (currentDefenderType === "collector") {
+  //     price = collectorPrice;
+  //   }
+  //   if (playerCredits < price) {
+  //     return;
+  //   }
+  //   if (checkIfDefenderExists(column, row)) {
+  //     return;
+  //   }
+  //   const newDefender = new Defender({
+  //     x: column,
+  //     y: row,
+  //     color: ex.Color.Red,
+  //     game: game,
+  //     defenderType: currentDefenderType,
+  //   });
+  //   game.add(newDefender);
+  //   playerCredits -= newDefender.creditCost;
+  //   creditsDisplay.textContent = `Credits: ${playerCredits}`;
+  // });
 }
 
 function createIntervals(game) {
@@ -286,8 +298,8 @@ async function main() {
 
   const firstEnemy = spawnEnemy();
 
-  createIntervals(game1);
-  createIntervals(game2);
+  // createIntervals(game1);
+  // createIntervals(game2);
   // game.add(myDefender);
   // game.add(myEnemy);
   const loader = new ex.Loader();
