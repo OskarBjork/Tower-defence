@@ -21,7 +21,8 @@ const loginBtn = document.querySelector("#loginBtn");
 
 const shooterBtn = document.querySelector("#shooterBtn");
 const collectorBtn = document.querySelector("#collectorBtn");
-const creditsDisplay = document.querySelector("#creditsDisplay");
+const player1CreditsDisplay = document.querySelector("#creditsDisplay1");
+const player2CreditsDisplay = document.querySelector("#creditsDisplay2");
 
 const defenderTypes = ["shooter", "collector"];
 
@@ -29,6 +30,7 @@ let currentDefenderType = "shooter";
 
 let clientUsername = "not set yet";
 let clientCanvas = "not set yet";
+let playerNumber = "";
 let playerCredits = 100;
 const shooterPrice = 30;
 const collectorPrice = 20;
@@ -55,8 +57,6 @@ const grid = [
   [0, 0, 0, 0, 0, 0, 0],
 ];
 
-creditsDisplay.textContent = `Credits: ${playerCredits}`;
-
 shooterBtn.addEventListener("click", () => {
   currentDefenderType = "shooter";
 });
@@ -77,11 +77,32 @@ loginBtn.addEventListener("click", () => {
 
 socket.on("start", (users) => {
   gameDiv.style.display = "flex";
+  users.forEach((user) => {
+    if ((user.playerNumber = "player1")) {
+      player1CreditsDisplay.textContent = `Credits: ${user.credits}`;
+    }
+    if ((user.playerNumber = "player2")) {
+      player2CreditsDisplay.textContent = `Credits: ${user.credits}`;
+    }
+  });
   main();
 });
 
-socket.on("setCanvas", (canvas) => {
-  clientCanvas = canvas;
+socket.on("setCanvas", (data) => {
+  clientCanvas = data.canvas;
+  if (clientCanvas === "canvas1") {
+    playerNumber = "player1";
+  }
+  if (clientCanvas === "canvas2") {
+    playerNumber = "player2";
+  }
+  playerCredits = data.credits;
+  if (playerNumber === "player1") {
+    player1CreditsDisplay.textContent = `Credits: ${playerCredits}`;
+  }
+  if (playerNumber === "player2") {
+    player2CreditsDisplay.textContent = `Credits: ${playerCredits}`;
+  }
 });
 
 socket.on("spawnDefender", (data) => {

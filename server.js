@@ -22,14 +22,22 @@ io.on("connection", (socket) => {
   console.log("a user connected");
   socket.on("login", (data) => {
     console.log("login", data);
-    let newUser = { ...data, id: socket.id };
+    let newUser = { ...data, id: socket.id, credits: 100 };
     if (users.length === 0) {
       newUser.canvas = "canvas1";
-      socket.emit("setCanvas", "canvas1");
+      socket.emit("setCanvas", {
+        canvas: "canvas1",
+        credits: newUser.credits,
+        playerNumber: "player1",
+      });
     }
     if (users.length === 1) {
       newUser.canvas = "canvas2";
-      socket.emit("setCanvas", "canvas2");
+      socket.emit("setCanvas", {
+        canvas: "canvas2",
+        credits: newUser.credits,
+        playerNumber: "player2",
+      });
     }
     if (users.length < 2) {
       users.push(newUser);
