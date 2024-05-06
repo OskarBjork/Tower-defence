@@ -8,6 +8,8 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server);
 
+let users = [];
+
 const path = require("path");
 
 app.use(express.static(path.join(__dirname)));
@@ -20,6 +22,17 @@ io.on("connection", (socket) => {
   console.log("a user connected");
   socket.on("login", (data) => {
     console.log("login", data);
+    let newUser = { ...data, id: socket.id };
+    users.push(newUser);
+    console.log(users);
+  });
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+    users = users.filter((user) => user.id !== socket.id);
+    if (users.length < 2) {
+      console.log("too few users left");
+    }
+    console.log(users);
   });
 });
 
