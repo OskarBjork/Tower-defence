@@ -28,9 +28,32 @@ const defenderTypes = ["shooter", "collector"];
 let currentDefenderType = "shooter";
 
 let clientUsername = "not set yet";
+let clientCanvas = "not set yet";
 let playerCredits = 100;
 const shooterPrice = 30;
 const collectorPrice = 20;
+
+const game1 = new ex.Engine({
+  width: 800,
+  height: 600,
+  canvasElementId: "canvas1",
+});
+
+const game2 = new ex.Engine({
+  width: 800,
+  height: 600,
+  canvasElementId: "canvas2",
+});
+
+const intervals = [];
+
+const grid = [
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0],
+];
 
 creditsDisplay.textContent = `Credits: ${playerCredits}`;
 
@@ -57,19 +80,19 @@ socket.on("start", (users) => {
   main();
 });
 
-socket.on("click", (data) => {
-  console.log(data);
+socket.on("setCanvas", (canvas) => {
+  clientCanvas = canvas;
 });
 
-const intervals = [];
-
-const grid = [
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0, 0],
-];
+socket.on("spawnDefender", (data) => {
+  const spawnCanvas = data.thisCanvas;
+  if (spawnCanvas === "canvas1") {
+    spawnDefender(data, game1);
+  }
+  if (spawnCanvas === "canvas2") {
+    spawnDefender(data, game2);
+  }
+});
 
 class Entity extends Actor {
   constructor(config) {
@@ -107,7 +130,7 @@ class Defender extends Entity {
     this.color = this.defenderType === "shooter" ? ex.Color.Red : ex.Color.Blue;
     this.creditCost =
       this.defenderType === "shooter" ? shooterPrice : collectorPrice;
-    grid[config.x][config.y] = this;
+    // grid[config.x][config.y] = this;
     this.row = config.y;
     this.column = config.x;
     if (this.defenderType === "shooter") {
@@ -214,8 +237,41 @@ function spawnEnemies() {
   return enemies;
 }
 
-function checkIfDefenderExists(x, y) {
-  return grid[x][y] instanceof Defender;
+function spawnDefender(data, game) {
+  const defenderType = data.currentDefenderType;
+  const column = Math.floor(data.y / tileSize) + 1;
+  const row = Math.floor(data.x / tileSize) + 1;
+  let price = 10;
+  if (currentDefenderType === "shooter") {
+    price = shooterPrice;
+  }
+  if (currentDefenderType === "collector") {
+    price = collectorPrice;
+  }
+  if (playerCredits < price) {
+    return;
+  }
+  if (checkIfDefenderExists(row, column)) {
+    return;
+  }
+  const newDefender = new Defender({
+    x: row,
+    y: column,
+    color: ex.Color.Red,
+    game: game,
+    defenderType: currentDefenderType,
+  });
+  console.log(newDefender);
+  game.add(newDefender);
+  console.log(newDefender.pos);
+  creditsDisplay.textContent = `Credits: ${playerCredits}`;
+}
+
+function checkIfDefenderExists(row, column) {
+  console.log("row", row);
+  console.log("column", column);
+  console.log(grid);
+  return grid[column - 1][row - 1] instanceof Defender;
 }
 
 function addMouseClickEvent(game) {
@@ -224,34 +280,9 @@ function addMouseClickEvent(game) {
       x: evt.worldPos.x,
       y: evt.worldPos.y,
       currentDefenderType: currentDefenderType,
+      canvas: game.canvasElementId,
     });
   });
-  //   const row = Math.floor(evt.worldPos.y / tileSize) + 1;
-  //   const column = Math.floor(evt.worldPos.x / tileSize) + 1;
-  //   let price = 10;
-  //   if (currentDefenderType === "shooter") {
-  //     price = shooterPrice;
-  //   }
-  //   if (currentDefenderType === "collector") {
-  //     price = collectorPrice;
-  //   }
-  //   if (playerCredits < price) {
-  //     return;
-  //   }
-  //   if (checkIfDefenderExists(column, row)) {
-  //     return;
-  //   }
-  //   const newDefender = new Defender({
-  //     x: column,
-  //     y: row,
-  //     color: ex.Color.Red,
-  //     game: game,
-  //     defenderType: currentDefenderType,
-  //   });
-  //   game.add(newDefender);
-  //   playerCredits -= newDefender.creditCost;
-  //   creditsDisplay.textContent = `Credits: ${playerCredits}`;
-  // });
 }
 
 function createIntervals(game) {
@@ -276,19 +307,9 @@ function createIntervals(game) {
 
 async function main() {
   gameDiv.style.display = "flex";
-  const game1 = new ex.Engine({
-    width: 800,
-    height: 600,
-    canvasElementId: "canvas1",
-  });
-
-  const game2 = new ex.Engine({
-    width: 800,
-    height: 600,
-    canvasElementId: "canvas2",
-  });
 
   addMouseClickEvent(game1);
+  addMouseClickEvent(game2);
   // const myDefender = new Defender({
   //   x: 1,
   //   y: 2,

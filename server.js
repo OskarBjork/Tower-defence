@@ -25,9 +25,11 @@ io.on("connection", (socket) => {
     let newUser = { ...data, id: socket.id };
     if (users.length === 0) {
       newUser.canvas = "canvas1";
+      socket.emit("setCanvas", "canvas1");
     }
     if (users.length === 1) {
       newUser.canvas = "canvas2";
+      socket.emit("setCanvas", "canvas2");
     }
     if (users.length < 2) {
       users.push(newUser);
@@ -48,8 +50,15 @@ io.on("connection", (socket) => {
   });
   socket.on("click", (data) => {
     console.log("click", data);
-    const user = users.find((user) => user.id === socket.id);
-    io.emit("click", { ...data, user });
+    let thisUser = users.find((user) => user.id === socket.id);
+    let thisCanvas = data.canvas;
+    if (thisUser.canvas != thisCanvas) {
+      return;
+    }
+    console.log("valid input");
+    console.log(thisUser);
+    console.log(thisCanvas);
+    io.emit("spawnDefender", { ...data, thisUser, thisCanvas });
   });
 });
 
