@@ -48,6 +48,13 @@ loginBtn.addEventListener("click", () => {
   socket.emit("login", { username: loginInput.value });
 });
 
+// IO events
+
+socket.on("start", (users) => {
+  gameDiv.style.display = "flex";
+  main();
+});
+
 const intervals = [];
 
 const grid = [

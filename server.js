@@ -23,8 +23,14 @@ io.on("connection", (socket) => {
   socket.on("login", (data) => {
     console.log("login", data);
     let newUser = { ...data, id: socket.id };
-    users.push(newUser);
+    if (users.length < 2) {
+      users.push(newUser);
+    }
     console.log(users);
+    if (users.length == 2) {
+      console.log("two users connected");
+      io.emit("start", users);
+    }
   });
   socket.on("disconnect", () => {
     console.log("user disconnected");
