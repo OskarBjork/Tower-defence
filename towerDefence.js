@@ -88,6 +88,16 @@ socket.on("start", (users) => {
   main();
 });
 
+socket.on("updateCredits", (data) => {
+  let thisCanvas = data.thisCanvas;
+  if (thisCanvas === "canvas1") {
+    player1CreditsDisplay.textContent = `Credits: ${data.thisUser.credits}`;
+  }
+  if (thisCanvas === "canvas2") {
+    player2CreditsDisplay.textContent = `Credits: ${data.thisUser.credits}`;
+  }
+});
+
 socket.on("setCanvas", (data) => {
   clientCanvas = data.canvas;
   if (clientCanvas === "canvas1") {
@@ -285,7 +295,6 @@ function spawnDefender(data, game) {
   console.log(newDefender);
   game.add(newDefender);
   console.log(newDefender.pos);
-  creditsDisplay.textContent = `Credits: ${playerCredits}`;
 }
 
 function checkIfDefenderExists(row, column) {

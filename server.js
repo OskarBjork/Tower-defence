@@ -59,6 +59,9 @@ io.on("connection", (socket) => {
   socket.on("click", (data) => {
     console.log("click", data);
     let thisUser = users.find((user) => user.id === socket.id);
+    if (!thisUser) {
+      return;
+    }
     let thisCanvas = data.canvas;
     if (thisUser.canvas != thisCanvas) {
       return;
@@ -66,6 +69,8 @@ io.on("connection", (socket) => {
     console.log("valid input");
     console.log(thisUser);
     console.log(thisCanvas);
+    thisUser.credits -= 10;
+    io.emit("updateCredits", { thisUser, thisCanvas });
     io.emit("spawnDefender", { ...data, thisUser, thisCanvas });
   });
 });
