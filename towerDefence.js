@@ -126,6 +126,28 @@ socket.on("spawnDefender", (data) => {
   }
 });
 
+socket.on("spawnEnemy", (data) => {
+  const row = data.row;
+  const column = data.column;
+  console.log(row, column);
+  let color;
+  if (data.color === "red") color = ex.Color.Red;
+  if (data.color === "blue") color = ex.Color.Blue;
+  if (data.color === "green") color = ex.Color.Green;
+  const myAttacker = new Attacker({
+    x: column,
+    y: row,
+    color: color,
+    hp: 5,
+    vel: vec(-100, 0),
+  });
+  game1.add(myAttacker);
+  game2.add(myAttacker);
+  game1.currentScene.actors.forEach((actor) => {
+    console.log(actor.pos);
+  });
+});
+
 class Entity extends Actor {
   constructor(config) {
     super({
@@ -237,44 +259,6 @@ class Attacker extends Entity {
   }
 }
 
-function placeEntities(entities) {
-  entities.forEach((entity) => {
-    grid[entity.x][entity.y] = entity;
-  });
-}
-function random(array) {
-  const index = Math.floor(Math.random() * array.length);
-  return array[index];
-}
-
-function spawnEnemy() {
-  const colors = [ex.Color.Red, ex.Color.Blue, ex.Color.Green];
-  return new Attacker({
-    x: 7,
-    y: random([1, 2, 3, 4, 5]),
-    color: random(colors),
-    hp: 5,
-    vel: vec(-100, 0),
-  });
-}
-
-function spawnEnemies() {
-  const enemies = [];
-  const colors = [ex.Color.Red, ex.Color.Blue, ex.Color.Green];
-  for (let i = 1; i <= 5; i++) {
-    enemies.push(
-      new Attacker({
-        x: 6,
-        y: i,
-        color: random(colors),
-        hp: 5,
-        vel: vec(-50, 0),
-      })
-    );
-  }
-  return enemies;
-}
-
 function spawnDefender(data, game, playerNumber) {
   const defenderType = data.currentDefenderType;
   const column = Math.floor(data.y / tileSize) + 1;
@@ -303,6 +287,43 @@ function spawnDefender(data, game, playerNumber) {
   console.log(newDefender);
   game.add(newDefender);
   console.log(newDefender.pos);
+}
+
+function placeEntities(entities) {
+  entities.forEach((entity) => {
+    grid[entity.x][entity.y] = entity;
+  });
+}
+function random(array) {
+  const index = Math.floor(Math.random() * array.length);
+  return array[index];
+}
+
+function spawnEnemy(row, column, color) {
+  return new Attacker({
+    x: row,
+    y: column,
+    color: random(colors),
+    hp: 5,
+    vel: vec(-100, 0),
+  });
+}
+
+function spawnEnemies() {
+  const enemies = [];
+  const colors = [ex.Color.Red, ex.Color.Blue, ex.Color.Green];
+  for (let i = 1; i <= 5; i++) {
+    enemies.push(
+      new Attacker({
+        x: 6,
+        y: i,
+        color: random(colors),
+        hp: 5,
+        vel: vec(-50, 0),
+      })
+    );
+  }
+  return enemies;
 }
 
 function checkIfDefenderExists(row, column) {
@@ -353,19 +374,7 @@ async function main() {
 
   addMouseClickEvent(game1);
   addMouseClickEvent(game2);
-  // const myDefender = new Defender({
-  //   x: 1,
-  //   y: 2,
-  //   color: ex.Color.Red,
-  //   game: game,
-  // });
 
-  const firstEnemy = spawnEnemy();
-
-  createIntervals(game1);
-  createIntervals(game2);
-  // game.add(myDefender);
-  // game.add(myEnemy);
   const loader = new ex.Loader();
   loader.suppressPlayButton = true;
   await game1.start(loader);
