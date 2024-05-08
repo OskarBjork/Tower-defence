@@ -117,11 +117,12 @@ socket.on("setCanvas", (data) => {
 
 socket.on("spawnDefender", (data) => {
   const spawnCanvas = data.thisCanvas;
+  const playerNumber = data.thisCanvas === "canvas1" ? "player1" : "player2";
   if (spawnCanvas === "canvas1") {
-    spawnDefender(data, game1);
+    spawnDefender(data, game1, playerNumber);
   }
   if (spawnCanvas === "canvas2") {
-    spawnDefender(data, game2);
+    spawnDefender(data, game2, playerNumber);
   }
 });
 
@@ -164,6 +165,7 @@ class Defender extends Entity {
     // grid[config.x][config.y] = this;
     this.row = config.y;
     this.column = config.x;
+    this.connectedPlayer = config.connectedPlayer;
     if (this.defenderType === "shooter") {
       this.intervalId = setInterval(() => {
         if (this.isKilled()) clearInterval(this.intervalId);
@@ -173,8 +175,13 @@ class Defender extends Entity {
   }
   kill() {
     super.kill();
-    grid[this.column][this.row] = 0;
+    grid[this.row - 1][this.column - 1] = 0;
     clearInterval(this.intervalId);
+    socket.emit("defenderKilled", {
+      row: this.row,
+      column: this.column,
+      connectedPlayer: this.connectedPlayer,
+    });
   }
   shoot() {
     const bullet = new Bullet({
@@ -268,7 +275,7 @@ function spawnEnemies() {
   return enemies;
 }
 
-function spawnDefender(data, game) {
+function spawnDefender(data, game, playerNumber) {
   const defenderType = data.currentDefenderType;
   const column = Math.floor(data.y / tileSize) + 1;
   const row = Math.floor(data.x / tileSize) + 1;
@@ -291,6 +298,7 @@ function spawnDefender(data, game) {
     color: ex.Color.Red,
     game: game,
     defenderType: currentDefenderType,
+    connectedPlayer: playerNumber,
   });
   console.log(newDefender);
   game.add(newDefender);
@@ -306,11 +314,16 @@ function checkIfDefenderExists(row, column) {
 
 function addMouseClickEvent(game) {
   game.input.pointers.primary.on("down", (evt) => {
+    const row = Math.floor(evt.worldPos.y / tileSize) + 1;
+    const column = Math.floor(evt.worldPos.x / tileSize) + 1;
     socket.emit("click", {
       x: evt.worldPos.x,
       y: evt.worldPos.y,
       currentDefenderType: currentDefenderType,
       canvas: game.canvasElementId,
+      row: row,
+      column: column,
+      playerNumber: playerNumber,
     });
   });
 }
@@ -349,8 +362,8 @@ async function main() {
 
   const firstEnemy = spawnEnemy();
 
-  // createIntervals(game1);
-  // createIntervals(game2);
+  createIntervals(game1);
+  createIntervals(game2);
   // game.add(myDefender);
   // game.add(myEnemy);
   const loader = new ex.Loader();

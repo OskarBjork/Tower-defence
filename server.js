@@ -8,6 +8,22 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server);
 
+const grid1 = [
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0],
+];
+
+const grid2 = [
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0],
+];
+
 let users = [];
 
 const path = require("path");
@@ -44,15 +60,12 @@ io.on("connection", (socket) => {
     }
     console.log(users);
     if (users.length >= 2) {
-      console.log("two users connected");
       io.emit("start", users);
     }
   });
   socket.on("disconnect", () => {
-    console.log("user disconnected");
     users = users.filter((user) => user.id !== socket.id);
     if (users.length < 2) {
-      console.log("too few users left");
     }
     console.log(users);
   });
@@ -66,12 +79,20 @@ io.on("connection", (socket) => {
     if (thisUser.canvas != thisCanvas) {
       return;
     }
-    console.log("valid input");
-    console.log(thisUser);
-    console.log(thisCanvas);
+    let currentGrid = data.playerNumber === "player1" ? grid1 : grid2;
+    if (currentGrid[data.row - 1][data.column - 1] !== 0) {
+      console.log("cell is occupied");
+      return;
+    }
     thisUser.credits -= 10;
+    currentGrid[data.row - 1][data.column - 1] = 1;
     io.emit("updateCredits", { thisUser, thisCanvas });
     io.emit("spawnDefender", { ...data, thisUser, thisCanvas });
+  });
+  socket.on("defenderKilled", (data) => {
+    let thisPlayer = data.connectedPlayer;
+    let currentGrid = thisPlayer === "player1" ? grid1 : grid2;
+    currentGrid[data.row - 1][data.column - 1] = 0;
   });
 });
 
