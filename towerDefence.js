@@ -134,18 +134,22 @@ socket.on("spawnEnemy", (data) => {
   if (data.color === "red") color = ex.Color.Red;
   if (data.color === "blue") color = ex.Color.Blue;
   if (data.color === "green") color = ex.Color.Green;
-  const myAttacker = new Attacker({
+  const myAttacker1 = new Attacker({
     x: column,
     y: row,
     color: color,
     hp: 5,
     vel: vec(-100, 0),
   });
-  game1.add(myAttacker);
-  game2.add(myAttacker);
-  game1.currentScene.actors.forEach((actor) => {
-    console.log(actor.pos);
+  const myAttacker2 = new Attacker({
+    x: column,
+    y: row,
+    color: color,
+    hp: 5,
+    vel: vec(-100, 0),
   });
+  game1.add(myAttacker1);
+  game2.add(myAttacker2);
 });
 
 class Entity extends Actor {
