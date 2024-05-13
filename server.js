@@ -89,7 +89,7 @@ io.on("connection", (socket) => {
             "numOfCollectors",
             user.numOfCollectors
           );
-          user.credits += 10 * user.numOfCollectors;
+          user.credits += user.numOfCollectors * 10;
           io.emit("updateCredits", { thisUser: user, thisCanvas: user.canvas });
         });
       }, 1000);

@@ -19,8 +19,10 @@ const loginDiv = document.querySelector("#loginDiv");
 const loginInput = document.querySelector("#usernameInput");
 const loginBtn = document.querySelector("#loginBtn");
 
-const shooterBtn = document.querySelector("#shooterBtn");
-const collectorBtn = document.querySelector("#collectorBtn");
+const shooterBtn1 = document.querySelector("#shooterBtn1");
+const collectorBtn1 = document.querySelector("#collectorBtn1");
+const shooterBtn2 = document.querySelector("#shooterBtn2");
+const collectorBtn2 = document.querySelector("#collectorBtn2");
 const player1CreditsDisplay = document.querySelector("#creditsDisplay1");
 const player2CreditsDisplay = document.querySelector("#creditsDisplay2");
 
@@ -57,12 +59,28 @@ const grid = [
   [0, 0, 0, 0, 0, 0, 0],
 ];
 
-shooterBtn.addEventListener("click", () => {
-  currentDefenderType = "shooter";
+shooterBtn1.addEventListener("click", () => {
+  if (playerNumber === "player1") {
+    currentDefenderType = "shooter";
+  }
 });
 
-collectorBtn.addEventListener("click", () => {
-  currentDefenderType = "collector";
+collectorBtn1.addEventListener("click", () => {
+  if (playerNumber === "player1") {
+    currentDefenderType = "collector";
+  }
+});
+
+shooterBtn2.addEventListener("click", () => {
+  if (playerNumber === "player2") {
+    currentDefenderType = "shooter";
+  }
+});
+
+collectorBtn2.addEventListener("click", () => {
+  if (playerNumber === "player2") {
+    currentDefenderType = "collector";
+  }
 });
 
 loginBtn.addEventListener("click", () => {
@@ -202,14 +220,16 @@ class Defender extends Entity {
   }
   kill() {
     super.kill();
-    grid[this.row - 1][this.column - 1] = 0;
     clearInterval(this.intervalId);
-    // socket.emit("defenderKilled", {
-    //   row: this.row,
-    //   column: this.column,
-    //   connectedPlayer: this.connectedPlayer,
-    //   defenderType: this.defenderType,
-    // });
+
+    if (playerNumber === this.connectedPlayer) {
+      socket.emit("defenderKilled", {
+        row: this.row,
+        column: this.column,
+        connectedPlayer: this.connectedPlayer,
+        defenderType: this.defenderType,
+      });
+    }
   }
   shoot() {
     const bullet = new Bullet({
