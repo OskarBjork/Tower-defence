@@ -344,7 +344,7 @@ function addMouseClickEvent(game) {
     socket.emit("click", {
       x: evt.worldPos.x,
       y: evt.worldPos.y,
-      currentDefenderType: currentDefenderType,
+      defenderType: currentDefenderType,
       canvas: game.canvasElementId,
       row: row,
       column: column,

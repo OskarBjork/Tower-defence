@@ -96,7 +96,14 @@ io.on("connection", (socket) => {
       console.log("cell is occupied");
       return;
     }
-    thisUser.credits -= 10;
+    let creditCost = 10;
+    if (data.defenderType === "shooter") {
+      creditCost = 30;
+    }
+    if (data.defenderType === "collector") {
+      creditCost = 10;
+    }
+    thisUser.credits -= creditCost;
     currentGrid[data.row - 1][data.column - 1] = 1;
     io.emit("updateCredits", { thisUser, thisCanvas });
     io.emit("spawnDefender", { ...data, thisUser, thisCanvas });
