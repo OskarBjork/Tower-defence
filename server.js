@@ -43,7 +43,13 @@ io.on("connection", (socket) => {
   console.log("a user connected");
   socket.on("login", (data) => {
     console.log("login", data);
-    let newUser = { ...data, id: socket.id, credits: 100 };
+    let newUser = {
+      ...data,
+      id: socket.id,
+      credits: 100,
+      numOfCollectors: 0,
+      numOfShooters: 0,
+    };
     if (users.length === 0) {
       newUser.canvas = "canvas1";
       socket.emit("setCanvas", {
@@ -73,6 +79,20 @@ io.on("connection", (socket) => {
         const column = 7;
         io.emit("spawnEnemy", { row: row, column: column, color: color });
       }, 3000);
+      setInterval(() => {
+        const defaultCredits = 10;
+        users.forEach((user) => {
+          user.credits += defaultCredits;
+          console.log(
+            "player",
+            user.id,
+            "numOfCollectors",
+            user.numOfCollectors
+          );
+          user.credits += 10 * user.numOfCollectors;
+          io.emit("updateCredits", { thisUser: user, thisCanvas: user.canvas });
+        });
+      }, 1000);
     }
   });
   socket.on("disconnect", () => {
@@ -103,15 +123,41 @@ io.on("connection", (socket) => {
     if (data.defenderType === "collector") {
       creditCost = 10;
     }
+    if (thisUser.credits < creditCost) {
+      console.log("not enough credits");
+      return;
+    }
+    if (data.defenderType === "collector") {
+      thisUser.numOfCollectors++;
+    }
+    if (data.defenderType === "shooter") {
+      thisUser.numOfShooters++;
+    }
     thisUser.credits -= creditCost;
     currentGrid[data.row - 1][data.column - 1] = 1;
     io.emit("updateCredits", { thisUser, thisCanvas });
-    io.emit("spawnDefender", { ...data, thisUser, thisCanvas });
+    io.emit("spawnDefender", {
+      ...data,
+      thisUser,
+      thisCanvas,
+      defenderType: data.defenderType,
+    });
   });
   socket.on("defenderKilled", (data) => {
     let thisPlayer = data.connectedPlayer;
     let currentGrid = thisPlayer === "player1" ? grid1 : grid2;
     currentGrid[data.row - 1][data.column - 1] = 0;
+    const typeOfDefender = data.defenderType;
+    let thisUser = users.find((user) => user.id === socket.id);
+    if (!thisUser) {
+      return;
+    }
+    if (typeOfDefender === "collector") {
+      thisUser.numOfCollectors--;
+    }
+    if (typeOfDefender === "shooter") {
+      thisUser.numOfShooters--;
+    }
   });
 });
 

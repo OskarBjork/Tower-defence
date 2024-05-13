@@ -118,11 +118,12 @@ socket.on("setCanvas", (data) => {
 socket.on("spawnDefender", (data) => {
   const spawnCanvas = data.thisCanvas;
   const playerNumber = data.thisCanvas === "canvas1" ? "player1" : "player2";
+  const defenderType = data.defenderType;
   if (spawnCanvas === "canvas1") {
-    spawnDefender(data, game1, playerNumber);
+    spawnDefender(data, game1, playerNumber, defenderType);
   }
   if (spawnCanvas === "canvas2") {
-    spawnDefender(data, game2, playerNumber);
+    spawnDefender(data, game2, playerNumber, defenderType);
   }
 });
 
@@ -203,11 +204,12 @@ class Defender extends Entity {
     super.kill();
     grid[this.row - 1][this.column - 1] = 0;
     clearInterval(this.intervalId);
-    socket.emit("defenderKilled", {
-      row: this.row,
-      column: this.column,
-      connectedPlayer: this.connectedPlayer,
-    });
+    // socket.emit("defenderKilled", {
+    //   row: this.row,
+    //   column: this.column,
+    //   connectedPlayer: this.connectedPlayer,
+    //   defenderType: this.defenderType,
+    // });
   }
   shoot() {
     const bullet = new Bullet({
@@ -263,8 +265,7 @@ class Attacker extends Entity {
   }
 }
 
-function spawnDefender(data, game, playerNumber) {
-  const defenderType = data.currentDefenderType;
+function spawnDefender(data, game, playerNumber, defenderType) {
   const column = Math.floor(data.y / tileSize) + 1;
   const row = Math.floor(data.x / tileSize) + 1;
   let price = 10;
@@ -285,7 +286,7 @@ function spawnDefender(data, game, playerNumber) {
     y: column,
     color: ex.Color.Red,
     game: game,
-    defenderType: currentDefenderType,
+    defenderType: defenderType,
     connectedPlayer: playerNumber,
   });
   console.log(newDefender);
@@ -309,7 +310,7 @@ function spawnEnemy(row, column, color) {
     y: column,
     color: random(colors),
     hp: 5,
-    vel: vec(-100, 0),
+    vel: vec(-10, 0),
   });
 }
 
