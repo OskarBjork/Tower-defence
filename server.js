@@ -42,7 +42,6 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
   console.log("a user connected");
   socket.on("login", (data) => {
-    console.log("login", data);
     let newUser = {
       ...data,
       id: socket.id,
@@ -69,7 +68,6 @@ io.on("connection", (socket) => {
     if (users.length < 2) {
       users.push(newUser);
     }
-    console.log(users);
     if (users.length >= 2) {
       io.emit("start", users);
       setInterval(() => {
@@ -83,12 +81,6 @@ io.on("connection", (socket) => {
         const defaultCredits = 10;
         users.forEach((user) => {
           user.credits += defaultCredits;
-          console.log(
-            "player",
-            user.id,
-            "numOfCollectors",
-            user.numOfCollectors
-          );
           user.credits += user.numOfCollectors * 10;
           io.emit("updateCredits", { thisUser: user, thisCanvas: user.canvas });
         });
@@ -102,7 +94,6 @@ io.on("connection", (socket) => {
     console.log(users);
   });
   socket.on("click", (data) => {
-    console.log("click", data);
     let thisUser = users.find((user) => user.id === socket.id);
     if (!thisUser) {
       return;
@@ -124,7 +115,6 @@ io.on("connection", (socket) => {
       creditCost = 10;
     }
     if (thisUser.credits < creditCost) {
-      console.log("not enough credits");
       return;
     }
     if (data.defenderType === "collector") {
@@ -158,6 +148,15 @@ io.on("connection", (socket) => {
     if (typeOfDefender === "shooter") {
       thisUser.numOfShooters--;
     }
+  });
+  socket.on("playerLost", (data) => {
+    const thisUser = users.find((user) => user.id === socket.id);
+    if (!thisUser) {
+      return;
+    }
+    const losingPlayer = thisUser.username;
+    const winningPlayer = users.find((user) => user.id !== socket.id).username;
+    io.emit("gameOver", { winner: winningPlayer, loser: losingPlayer });
   });
 });
 

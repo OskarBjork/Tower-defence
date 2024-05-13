@@ -25,6 +25,7 @@ const shooterBtn2 = document.querySelector("#shooterBtn2");
 const collectorBtn2 = document.querySelector("#collectorBtn2");
 const player1CreditsDisplay = document.querySelector("#creditsDisplay1");
 const player2CreditsDisplay = document.querySelector("#creditsDisplay2");
+const winnerDisplay = document.querySelector("#winnerDisplay");
 
 const defenderTypes = ["shooter", "collector"];
 
@@ -171,6 +172,15 @@ socket.on("spawnEnemy", (data) => {
   game2.add(myAttacker2);
 });
 
+socket.on("gameOver", (data) => {
+  const winner = data.winner;
+  winnerDisplay.textContent = `Winner: ${winner}`;
+  winnerDisplay.style.display = "block";
+  game1.stop();
+  game2.stop();
+  gameDiv.style.display = "none";
+});
+
 class Entity extends Actor {
   constructor(config) {
     super({
@@ -281,6 +291,7 @@ class Attacker extends Entity {
         color: ex.Color.White,
       });
       engine.add(gameOver);
+      socket.emit("playerLost", { playerNumber: playerNumber });
     }
   }
 }
