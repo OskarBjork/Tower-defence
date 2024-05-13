@@ -3,10 +3,23 @@ const { createServer } = require("node:http");
 const { join } = require("node:path");
 const { disconnect } = require("node:process");
 const { Server } = require("socket.io");
+const mysql = require("mysql2");
 
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
+
+const connection = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "prog 2 projekt db",
+});
+
+connection.connect((err) => {
+  if (err) throw err;
+  console.log("Connected to the database YEAHHHH!");
+});
 
 const grid1 = [
   [0, 0, 0, 0, 0, 0, 0],
@@ -42,6 +55,14 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
   console.log("a user connected");
   socket.on("login", (data) => {
+    connection.query(
+      'SELECT password FROM players WHERE name = "' + data.username + '"',
+      function (err, results) {
+        if (err) throw err;
+        console.log(results);
+      }
+    );
+
     let newUser = {
       ...data,
       id: socket.id,
