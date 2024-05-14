@@ -15,6 +15,10 @@ const gameDiv = document.querySelector("#gameDiv");
 const canvas1 = document.querySelector("#canvas1");
 const canvas2 = document.querySelector("#canvas2");
 
+const registerDiv = document.querySelector("#registerDiv");
+const registerForm = document.querySelector("#registerForm");
+const registerInput = document.querySelector("#usernameRegisterInput");
+
 const loginDiv = document.querySelector("#loginDiv");
 const loginForm = document.querySelector("#loginForm");
 const loginInput = document.querySelector("#usernameInput");
@@ -88,10 +92,19 @@ collectorBtn2.addEventListener("click", () => {
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
   loginDiv.style.display = "none";
+  registerDiv.style.display = "none";
   console.log("lol");
   console.log(loginInput.value);
   socket.emit("login", { username: loginInput.value });
   clientUsername = loginInput.value;
+});
+
+registerForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  registerDiv.style.display = "none";
+  console.log("lol");
+  socket.emit("register", { username: registerInput.value });
+  clientUsername = registerInput.value;
 });
 
 // loginBtn.addEventListener("click", () => {

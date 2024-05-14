@@ -108,6 +108,20 @@ io.on("connection", (socket) => {
       }, 1000);
     }
   });
+  socket.on("register", (data) => {
+    console.log(data.username, data.password);
+    connection.query(
+      'INSERT INTO players (name, password) VALUES ("' +
+        data.username +
+        '", "' +
+        data.password +
+        '")',
+      function (err, results) {
+        if (err) throw err;
+        console.log(results);
+      }
+    );
+  });
   socket.on("disconnect", () => {
     users = users.filter((user) => user.id !== socket.id);
     if (users.length < 2) {
