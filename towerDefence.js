@@ -16,6 +16,7 @@ const canvas1 = document.querySelector("#canvas1");
 const canvas2 = document.querySelector("#canvas2");
 
 const loginDiv = document.querySelector("#loginDiv");
+const loginForm = document.querySelector("#loginForm");
 const loginInput = document.querySelector("#usernameInput");
 const loginBtn = document.querySelector("#loginBtn");
 
@@ -84,13 +85,22 @@ collectorBtn2.addEventListener("click", () => {
   }
 });
 
-loginBtn.addEventListener("click", () => {
+loginForm.addEventListener("submit", (e) => {
+  e.preventDefault();
   loginDiv.style.display = "none";
   console.log("lol");
   console.log(loginInput.value);
   socket.emit("login", { username: loginInput.value });
   clientUsername = loginInput.value;
 });
+
+// loginBtn.addEventListener("click", () => {
+//   loginDiv.style.display = "none";
+//   console.log("lol");
+//   console.log(loginInput.value);
+//   socket.emit("login", { username: loginInput.value });
+//   clientUsername = loginInput.value;
+// });
 
 // IO events
 
