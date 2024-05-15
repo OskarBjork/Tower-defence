@@ -117,8 +117,13 @@ io.on("connection", (socket) => {
         data.password +
         '")',
       function (err, results) {
-        if (err) throw err;
+        if (err) {
+          socket.emit("registrationFailed");
+          console.log("registration failed");
+          return;
+        }
         console.log(results);
+        socket.emit("registrationSuccess");
       }
     );
   });

@@ -18,6 +18,7 @@ const canvas2 = document.querySelector("#canvas2");
 const registerDiv = document.querySelector("#registerDiv");
 const registerForm = document.querySelector("#registerForm");
 const registerInput = document.querySelector("#usernameRegisterInput");
+const registerErrorText = document.querySelector("#registerErrorText");
 
 const loginDiv = document.querySelector("#loginDiv");
 const loginForm = document.querySelector("#loginForm");
@@ -101,7 +102,6 @@ loginForm.addEventListener("submit", (e) => {
 
 registerForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  registerDiv.style.display = "none";
   console.log("lol");
   socket.emit("register", { username: registerInput.value });
   clientUsername = registerInput.value;
@@ -128,6 +128,17 @@ socket.on("start", (users) => {
     }
   });
   main();
+});
+
+socket.on("registrationFailed", () => {
+  console.log("registration failed");
+  registerErrorText.textContent = "Registration failed";
+});
+
+socket.on("registrationSuccess", () => {
+  console.log("registration success");
+  registerDiv.style.display = "none";
+  registerErrorText.textContent = "Registration success";
 });
 
 socket.on("updateCredits", (data) => {
