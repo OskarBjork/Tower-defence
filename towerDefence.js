@@ -19,11 +19,13 @@ const registerDiv = document.querySelector("#registerDiv");
 const registerForm = document.querySelector("#registerForm");
 const registerInput = document.querySelector("#usernameRegisterInput");
 const errorText = document.querySelector("#errorText");
+const registerPasswordInput = document.querySelector("#registerPasswordInput");
 
 const loginDiv = document.querySelector("#loginDiv");
 const loginForm = document.querySelector("#loginForm");
 const loginInput = document.querySelector("#usernameInput");
 const loginBtn = document.querySelector("#loginBtn");
+const passwordLoginInput = document.querySelector("#passwordLoginInput");
 
 const shooterBtn1 = document.querySelector("#shooterBtn1");
 const collectorBtn1 = document.querySelector("#collectorBtn1");
@@ -92,14 +94,21 @@ collectorBtn2.addEventListener("click", () => {
 
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  socket.emit("login", { username: loginInput.value });
+  socket.emit("login", {
+    username: loginInput.value,
+    password: passwordLoginInput.value,
+  });
   clientUsername = loginInput.value;
 });
 
 registerForm.addEventListener("submit", (e) => {
   e.preventDefault();
   console.log("lol");
-  socket.emit("register", { username: registerInput.value });
+  const password = registerPasswordInput.value;
+  socket.emit("register", {
+    username: registerInput.value,
+    password: password,
+  });
   clientUsername = registerInput.value;
 });
 
