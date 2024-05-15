@@ -18,7 +18,7 @@ const canvas2 = document.querySelector("#canvas2");
 const registerDiv = document.querySelector("#registerDiv");
 const registerForm = document.querySelector("#registerForm");
 const registerInput = document.querySelector("#usernameRegisterInput");
-const registerErrorText = document.querySelector("#registerErrorText");
+const errorText = document.querySelector("#errorText");
 
 const loginDiv = document.querySelector("#loginDiv");
 const loginForm = document.querySelector("#loginForm");
@@ -92,10 +92,6 @@ collectorBtn2.addEventListener("click", () => {
 
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
-  loginDiv.style.display = "none";
-  registerDiv.style.display = "none";
-  console.log("lol");
-  console.log(loginInput.value);
   socket.emit("login", { username: loginInput.value });
   clientUsername = loginInput.value;
 });
@@ -139,6 +135,17 @@ socket.on("registrationSuccess", () => {
   console.log("registration success");
   registerDiv.style.display = "none";
   registerErrorText.textContent = "Registration success";
+});
+
+socket.on("loginFailed", () => {
+  console.log("login failed");
+  errorText.textContent = "Login failed";
+});
+
+socket.on("loginSuccess", () => {
+  console.log("login success");
+  loginDiv.style.display = "none";
+  registerDiv.style.display = "none";
 });
 
 socket.on("updateCredits", (data) => {

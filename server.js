@@ -55,58 +55,74 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
   console.log("a user connected");
   socket.on("login", (data) => {
+    const username = data.username;
     connection.query(
-      'SELECT password FROM players WHERE name = "' + data.username + '"',
+      'SELECT name FROM players WHERE name = "' + username + '"',
       function (err, results) {
         if (err) throw err;
-        console.log(results);
+        if (results.length === 0) {
+          socket.emit("loginFailed");
+          console.log("login failed");
+          return;
+        }
+        socket.emit("loginSuccess");
+        let newUser = {
+          ...data,
+          id: socket.id,
+          credits: 100,
+          numOfCollectors: 0,
+          numOfShooters: 0,
+        };
+        if (users.length === 0) {
+          newUser.canvas = "canvas1";
+          socket.emit("setCanvas", {
+            canvas: "canvas1",
+            credits: newUser.credits,
+            playerNumber: "player1",
+          });
+        }
+        if (users.length === 1) {
+          newUser.canvas = "canvas2";
+          socket.emit("setCanvas", {
+            canvas: "canvas2",
+            credits: newUser.credits,
+            playerNumber: "player2",
+          });
+        }
+        if (users.length < 2) {
+          users.push(newUser);
+        }
+        if (users.length >= 2) {
+          io.emit("start", users);
+          setInterval(() => {
+            const colors = ["red", "blue", "green"];
+            const color = random(colors);
+            const row = Math.floor(Math.random() * 5) + 1;
+            const column = 7;
+            io.emit("spawnEnemy", { row: row, column: column, color: color });
+          }, 3000);
+          setInterval(() => {
+            const defaultCredits = 10;
+            users.forEach((user) => {
+              user.credits += defaultCredits;
+              user.credits += user.numOfCollectors * 10;
+              io.emit("updateCredits", {
+                thisUser: user,
+                thisCanvas: user.canvas,
+              });
+            });
+          }, 1000);
+        }
+
+        // connection.query(
+        //   'SELECT password FROM players WHERE name = "' + data.username + '"',
+        //   function (err, results) {
+        //     if (err) throw err;
+        //     console.log(results);
+        //   }
+        // );
       }
     );
-
-    let newUser = {
-      ...data,
-      id: socket.id,
-      credits: 100,
-      numOfCollectors: 0,
-      numOfShooters: 0,
-    };
-    if (users.length === 0) {
-      newUser.canvas = "canvas1";
-      socket.emit("setCanvas", {
-        canvas: "canvas1",
-        credits: newUser.credits,
-        playerNumber: "player1",
-      });
-    }
-    if (users.length === 1) {
-      newUser.canvas = "canvas2";
-      socket.emit("setCanvas", {
-        canvas: "canvas2",
-        credits: newUser.credits,
-        playerNumber: "player2",
-      });
-    }
-    if (users.length < 2) {
-      users.push(newUser);
-    }
-    if (users.length >= 2) {
-      io.emit("start", users);
-      setInterval(() => {
-        const colors = ["red", "blue", "green"];
-        const color = random(colors);
-        const row = Math.floor(Math.random() * 5) + 1;
-        const column = 7;
-        io.emit("spawnEnemy", { row: row, column: column, color: color });
-      }, 3000);
-      setInterval(() => {
-        const defaultCredits = 10;
-        users.forEach((user) => {
-          user.credits += defaultCredits;
-          user.credits += user.numOfCollectors * 10;
-          io.emit("updateCredits", { thisUser: user, thisCanvas: user.canvas });
-        });
-      }, 1000);
-    }
   });
   socket.on("register", (data) => {
     console.log(data.username, data.password);
