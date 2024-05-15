@@ -207,6 +207,7 @@ io.on("connection", (socket) => {
   });
   socket.on("playerLost", (data) => {
     const thisUser = users.find((user) => user.id === socket.id);
+    console.log(thisUser);
     if (!thisUser) {
       return;
     }

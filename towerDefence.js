@@ -116,6 +116,7 @@ registerForm.addEventListener("submit", (e) => {
 socket.on("start", (users) => {
   gameDiv.style.display = "flex";
   users.forEach((user) => {
+    errorText.style.display = "none";
     if ((user.playerNumber = "player1")) {
       player1CreditsDisplay.textContent = `Credits: ${user.credits}`;
     }
@@ -145,6 +146,7 @@ socket.on("loginFailed", () => {
 socket.on("loginSuccess", () => {
   console.log("login success");
   loginDiv.style.display = "none";
+  errorText.textContent = "Login success";
   registerDiv.style.display = "none";
 });
 
@@ -199,6 +201,7 @@ socket.on("spawnEnemy", (data) => {
     x: column,
     y: row,
     color: color,
+    connectedPlayer: "player1",
     hp: 5,
     vel: vec(-100, 0),
   });
@@ -206,6 +209,7 @@ socket.on("spawnEnemy", (data) => {
     x: column,
     y: row,
     color: color,
+    connectedPlayer: "player2",
     hp: 5,
     vel: vec(-100, 0),
   });
@@ -300,6 +304,7 @@ class Attacker extends Entity {
   constructor(config) {
     super(config);
     this.speed = 10;
+    this.connectedPlayer = config.connectedPlayer;
     this.on("collisionstart", (e) => {
       if (e.other instanceof Bullet) {
         e.other.kill();
@@ -332,7 +337,11 @@ class Attacker extends Entity {
         color: ex.Color.White,
       });
       engine.add(gameOver);
-      socket.emit("playerLost", { playerNumber: playerNumber });
+      console.log("connectedPlayer:", this.connectedPlayer);
+      console.log("playerNumber:", playerNumber);
+      if (this.connectedPlayer === playerNumber) {
+        socket.emit("playerLost", { playerNumber: playerNumber });
+      }
     }
   }
 }
@@ -381,6 +390,7 @@ function spawnEnemy(row, column, color) {
     x: row,
     y: column,
     color: random(colors),
+    connectedPlayer: playerNumber,
     hp: 5,
     vel: vec(-10, 0),
   });
