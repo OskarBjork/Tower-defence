@@ -54,10 +54,24 @@ app.get("/", (req, res) => {
 
 io.on("connection", (socket) => {
   console.log("a user connected");
+  connection.query(
+    "SELECT * FROM players ORDER BY score DESC LIMIT 5",
+    function (err, results) {
+      if (err) throw err;
+      console.log(results);
+      const users = results.map((user) => {
+        return {
+          name: user.name,
+          score: user.score,
+        };
+      });
+      socket.emit("scoreboard", users);
+    }
+  );
   socket.on("login", (data) => {
     const username = data.username;
     connection.query(
-      'SELECT name FROM players WHERE name = "' + username + '"',
+      'SELECT name, password FROM players WHERE name = "' + username + '"',
       function (err, results) {
         if (err) throw err;
         if (results.length === 0) {
@@ -221,7 +235,32 @@ io.on("connection", (socket) => {
     }
     const losingPlayer = thisUser.username;
     const winningPlayer = users.find((user) => user.id !== socket.id).username;
+    connection.query(
+      'UPDATE players SET score = score + 1 WHERE name = "' +
+        winningPlayer +
+        '"',
+      function (err, results) {
+        if (err) throw err;
+        console.log(results);
+      }
+    );
     io.emit("gameOver", { winner: winningPlayer, loser: losingPlayer });
+  });
+  socket.on("getScoreboard", () => {
+    connection.query(
+      "SELECT * FROM players ORDER BY score DESC LIMIT 5",
+      function (err, results) {
+        if (err) throw err;
+        console.log(results);
+        const users = results.map((user) => {
+          return {
+            name: user.name,
+            score: user.score,
+          };
+        });
+        socket.emit("scoreboard", users);
+      }
+    );
   });
 });
 

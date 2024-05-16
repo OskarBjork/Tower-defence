@@ -35,6 +35,9 @@ const player1CreditsDisplay = document.querySelector("#creditsDisplay1");
 const player2CreditsDisplay = document.querySelector("#creditsDisplay2");
 const winnerDisplay = document.querySelector("#winnerDisplay");
 
+const scoreboardDiv = document.querySelector("#scoreboardDiv");
+const scoreboardTable = document.querySelector("#scoreboardTable");
+
 const defenderTypes = ["shooter", "collector"];
 
 let currentDefenderType = "shooter";
@@ -133,6 +136,7 @@ socket.on("start", (users) => {
       player2CreditsDisplay.textContent = `Credits: ${user.credits}`;
     }
   });
+  scoreboardDiv.style.display = "none";
   main();
 });
 
@@ -233,7 +237,29 @@ socket.on("gameOver", (data) => {
   game1.stop();
   game2.stop();
   gameDiv.style.display = "none";
+  scoreboardDiv.style.display = "block";
+  updateScoreboard();
 });
+
+socket.on("scoreboard", (data) => {
+  scoreboardDiv.style.display = "block";
+  const table = document.querySelector("#scoreboardTable");
+  table.innerHTML = "<tr><th>Username</th><th>Wins</th></tr>";
+  data.forEach((user) => {
+    const row = document.createElement("tr");
+    const username = document.createElement("td");
+    const score = document.createElement("td");
+    username.textContent = user.name;
+    score.textContent = user.score;
+    row.appendChild(username);
+    row.appendChild(score);
+    table.appendChild(row);
+  });
+});
+
+function updateScoreboard() {
+  socket.emit("getScoreboard");
+}
 
 class Entity extends Actor {
   constructor(config) {
