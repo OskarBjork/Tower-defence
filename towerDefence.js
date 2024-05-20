@@ -50,6 +50,7 @@ let playerCredits = 100;
 const shooterPrice = 30;
 const collectorPrice = 20;
 
+
 const game1 = new ex.Engine({
   width: 800,
   height: 600,
@@ -241,6 +242,10 @@ socket.on("spawnEnemy", (data) => {
     hp: 5,
     vel: vec(-100, 0),
   });
+  console.log("stuvis skapas")
+    myAttacker1.graphics.use(stuvis.toSprite());
+    myAttacker2.graphics.use(stuvis.toSprite());
+    console.log("stuvis is real")
   game1.add(myAttacker1);
   game2.add(myAttacker2);
 });
@@ -512,6 +517,11 @@ async function main() {
   addMouseClickEvent(game1);
   addMouseClickEvent(game2);
 
+  // Jag ger upp, för dålig dokumentation för att jag ska fatta.
+  // Testkod för att fixa bilder till Actors
+  // const stuvis = new ex.ImageSource('./stuvis.jpg')
+  // console.log("stuvis ska vara här:", stuvis)
+  
   const loader = new ex.Loader();
   loader.suppressPlayButton = true;
   await game1.start(loader);

@@ -43,7 +43,6 @@ INSERT INTO `players` (`id`, `name`, `password`, `score`) VALUES
 (2, 'cool', 'hi', 0),
 (10, 'test', '12', 15),
 (11, 'test2', '12', 0),
-(13, 'thegay', '123', 1);
 
 --
 -- Index för dumpade tabeller
