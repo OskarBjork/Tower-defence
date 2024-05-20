@@ -54,7 +54,7 @@ app.get("/", (req, res) => {
 
 io.on("connection", (socket) => {
   console.log("a user connected");
-  connection.query(
+  connection. query(
     "SELECT * FROM players ORDER BY score DESC LIMIT 5",
     function (err, results) {
       if (err) throw err;

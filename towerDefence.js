@@ -19,6 +19,7 @@ const registerDiv = document.querySelector("#registerDiv");
 const registerForm = document.querySelector("#registerForm");
 const registerInput = document.querySelector("#usernameRegisterInput");
 const errorText = document.querySelector("#errorText");
+const otherText = document.querySelector("#otherText")
 const registerPasswordInput = document.querySelector("#registerPasswordInput");
 
 const loginDiv = document.querySelector("#loginDiv");
@@ -71,25 +72,34 @@ const grid = [
   [0, 0, 0, 0, 0, 0, 0],
 ];
 
-shooterBtn1.addEventListener("click", () => {
+shooterBtn1.addEventListener("click", (event) => {
+  event.target.classList.add("selectedBtn")
+  collectorBtn1.classList.remove("selectedBtn")
   if (playerNumber === "player1") {
     currentDefenderType = "shooter";
   }
+
 });
 
-collectorBtn1.addEventListener("click", () => {
+collectorBtn1.addEventListener("click", (event) => {
+  event.target.classList.add("selectedBtn")
+  shooterBtn1.classList.remove("selectedBtn")
   if (playerNumber === "player1") {
     currentDefenderType = "collector";
   }
 });
 
-shooterBtn2.addEventListener("click", () => {
+shooterBtn2.addEventListener("click", (event) => {
+  event.target.classList.add("selectedBtn")
+  collectorBtn2.classList.remove("selectedBtn")
   if (playerNumber === "player2") {
     currentDefenderType = "shooter";
   }
 });
 
-collectorBtn2.addEventListener("click", () => {
+collectorBtn2.addEventListener("click", (event) => {
+  event.target.classList.add("selectedBtn")
+  shooterBtn2.classList.remove("selectedBtn")
   if (playerNumber === "player2") {
     currentDefenderType = "collector";
   }
@@ -129,6 +139,7 @@ socket.on("start", (users) => {
   gameDiv.style.display = "flex";
   users.forEach((user) => {
     errorText.style.display = "none";
+    otherText.style.display = "none";
     if ((user.playerNumber = "player1")) {
       player1CreditsDisplay.textContent = `Credits: ${user.credits}`;
     }
@@ -142,24 +153,28 @@ socket.on("start", (users) => {
 
 socket.on("registrationFailed", () => {
   console.log("registration failed");
-  registerErrorText.textContent = "Registration failed";
+  errorText.style.display = "flex"
+  errorText.textContent = "Registration failed";
 });
 
 socket.on("registrationSuccess", () => {
   console.log("registration success");
   registerDiv.style.display = "none";
-  registerErrorText.textContent = "Registration success";
+  errorText.style.display = "none";
+  otherText.textContent = "Registration success";
 });
 
 socket.on("loginFailed", () => {
   console.log("login failed");
+  errorText.style.display = "flex"
   errorText.textContent = "Login failed";
 });
 
 socket.on("loginSuccess", () => {
   console.log("login success");
   loginDiv.style.display = "none";
-  errorText.textContent = "Login success";
+  errorText.style.display = "none";
+  otherText.textContent = "Login success, waiting for player . . .";
   registerDiv.style.display = "none";
 });
 
@@ -244,7 +259,7 @@ socket.on("gameOver", (data) => {
 socket.on("scoreboard", (data) => {
   scoreboardDiv.style.display = "block";
   const table = document.querySelector("#scoreboardTable");
-  table.innerHTML = "<tr><th>Username</th><th>Wins</th></tr>";
+  table.innerHTML = "<tr><th>Scoreboard!<th><tr><tr><th>Username</th><th>Wins</th></tr>";
   data.forEach((user) => {
     const row = document.createElement("tr");
     const username = document.createElement("td");
