@@ -248,7 +248,7 @@ socket.on("spawnEnemy", (data) => {
 socket.on("gameOver", (data) => {
   const winner = data.winner;
   winnerDisplay.textContent = `Winner: ${winner}`;
-  winnerDisplay.style.display = "block";
+  winnerDisplay.style.display = "inline-block";
   game1.stop();
   game2.stop();
   gameDiv.style.display = "none";
