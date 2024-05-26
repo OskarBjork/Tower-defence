@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "express": "^4.19.2",
+    "mysql2": "^3.9.7",
+    "socket.io": "^4.7.5",
+    "socketio": "^1.0.0",
+    "sockets": "^0.4.2"
+  }
+}
