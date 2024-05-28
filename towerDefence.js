@@ -19,7 +19,7 @@ const registerDiv = document.querySelector("#registerDiv");
 const registerForm = document.querySelector("#registerForm");
 const registerInput = document.querySelector("#usernameRegisterInput");
 const errorText = document.querySelector("#errorText");
-const otherText = document.querySelector("#otherText")
+const otherText = document.querySelector("#otherText");
 const registerPasswordInput = document.querySelector("#registerPasswordInput");
 
 const loginDiv = document.querySelector("#loginDiv");
@@ -50,7 +50,6 @@ let playerCredits = 100;
 const shooterPrice = 30;
 const collectorPrice = 20;
 
-
 const game1 = new ex.Engine({
   width: 800,
   height: 600,
@@ -74,33 +73,32 @@ const grid = [
 ];
 
 shooterBtn1.addEventListener("click", (event) => {
-  event.target.classList.add("selectedBtn")
-  collectorBtn1.classList.remove("selectedBtn")
+  event.target.classList.add("selectedBtn");
+  collectorBtn1.classList.remove("selectedBtn");
   if (playerNumber === "player1") {
     currentDefenderType = "shooter";
   }
-
 });
 
 collectorBtn1.addEventListener("click", (event) => {
-  event.target.classList.add("selectedBtn")
-  shooterBtn1.classList.remove("selectedBtn")
+  event.target.classList.add("selectedBtn");
+  shooterBtn1.classList.remove("selectedBtn");
   if (playerNumber === "player1") {
     currentDefenderType = "collector";
   }
 });
 
 shooterBtn2.addEventListener("click", (event) => {
-  event.target.classList.add("selectedBtn")
-  collectorBtn2.classList.remove("selectedBtn")
+  event.target.classList.add("selectedBtn");
+  collectorBtn2.classList.remove("selectedBtn");
   if (playerNumber === "player2") {
     currentDefenderType = "shooter";
   }
 });
 
 collectorBtn2.addEventListener("click", (event) => {
-  event.target.classList.add("selectedBtn")
-  shooterBtn2.classList.remove("selectedBtn")
+  event.target.classList.add("selectedBtn");
+  shooterBtn2.classList.remove("selectedBtn");
   if (playerNumber === "player2") {
     currentDefenderType = "collector";
   }
@@ -154,7 +152,7 @@ socket.on("start", (users) => {
 
 socket.on("registrationFailed", () => {
   console.log("registration failed");
-  errorText.style.display = "flex"
+  errorText.style.display = "flex";
   errorText.textContent = "Registration failed";
 });
 
@@ -167,7 +165,7 @@ socket.on("registrationSuccess", () => {
 
 socket.on("loginFailed", () => {
   console.log("login failed");
-  errorText.style.display = "flex"
+  errorText.style.display = "flex";
   errorText.textContent = "Login failed";
 });
 
@@ -242,10 +240,10 @@ socket.on("spawnEnemy", (data) => {
     hp: 5,
     vel: vec(-100, 0),
   });
-  console.log("stuvis skapas")
-    myAttacker1.graphics.use(stuvis.toSprite());
-    myAttacker2.graphics.use(stuvis.toSprite());
-    console.log("stuvis is real")
+  // console.log("stuvis skapas")
+  //   myAttacker1.graphics.use(stuvis.toSprite());
+  //   myAttacker2.graphics.use(stuvis.toSprite());
+  //   console.log("stuvis is real")
   game1.add(myAttacker1);
   game2.add(myAttacker2);
 });
@@ -264,7 +262,8 @@ socket.on("gameOver", (data) => {
 socket.on("scoreboard", (data) => {
   scoreboardDiv.style.display = "block";
   const table = document.querySelector("#scoreboardTable");
-  table.innerHTML = "<tr><th>Scoreboard!<th><tr><tr><th>Username</th><th>Wins</th></tr>";
+  table.innerHTML =
+    "<tr><th>Scoreboard!<th><tr><tr><th>Username</th><th>Wins</th></tr>";
   data.forEach((user) => {
     const row = document.createElement("tr");
     const username = document.createElement("td");
@@ -521,7 +520,7 @@ async function main() {
   // Testkod för att fixa bilder till Actors
   // const stuvis = new ex.ImageSource('./stuvis.jpg')
   // console.log("stuvis ska vara här:", stuvis)
-  
+
   const loader = new ex.Loader();
   loader.suppressPlayButton = true;
   await game1.start(loader);

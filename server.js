@@ -54,7 +54,7 @@ app.get("/", (req, res) => {
 
 io.on("connection", (socket) => {
   console.log("a user connected");
-  connection. query(
+  connection.query(
     "SELECT * FROM players ORDER BY score DESC LIMIT 5",
     function (err, results) {
       if (err) throw err;
@@ -118,18 +118,17 @@ io.on("connection", (socket) => {
             }
             if (users.length >= 2) {
               io.emit("start", users);
-              // TEMPORÄRT
-              // setInterval(() => {
-              //   const colors = ["red", "blue", "green"];
-              //   const color = random(colors);
-              //   const row = Math.floor(Math.random() * 5) + 1;
-              //   const column = 7;
-              //   io.emit("spawnEnemy", {
-              //     row: row,
-              //     column: column,
-              //     color: color,
-              //   });
-              // }, 3000);
+              setInterval(() => {
+                const colors = ["red", "blue", "green"];
+                const color = random(colors);
+                const row = Math.floor(Math.random() * 5) + 1;
+                const column = 7;
+                io.emit("spawnEnemy", {
+                  row: row,
+                  column: column,
+                  color: color,
+                });
+              }, 3000);
               setInterval(() => {
                 const defaultCredits = 10;
                 users.forEach((user) => {
